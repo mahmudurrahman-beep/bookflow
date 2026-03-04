@@ -1,0 +1,125 @@
+/* Custom styles for BookFlow */
+
+/* General styles */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Booking form styles */
+.booking-form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Calendar customizations */
+.fc-event {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.fc-event:hover {
+    transform: scale(1.02);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Status badges */
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.status-badge.booked { background: #ffc107; color: #000; }
+.status-badge.confirmed { background: #28a745; color: #fff; }
+.status-badge.completed { background: #6c757d; color: #fff; }
+.status-badge.cancelled { background: #dc3545; color: #fff; }
+.status-badge.no-show { background: #fd7e14; color: #fff; }
+
+/* Card hover effects */
+.card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .booking-form {
+        padding: 15px;
+    }
+    
+    h1.display-4 {
+        font-size: 2.5rem;
+    }
+}
+
+/* Loading spinner */
+.spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #007bff;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Admin dashboard */
+.admin-sidebar {
+    background: #f8f9fa;
+    min-height: calc(100vh - 56px);
+    padding: 20px;
+    border-right: 1px solid #dee2e6;
+}
+
+/* Booking details modal */
+.booking-detail-item {
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.booking-detail-label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.booking-detail-value {
+    font-size: 1rem;
+    color: #212529;
+}
+
+/* Time slot buttons */
+.time-slot-btn {
+    margin: 0.25rem;
+    min-width: 80px;
+}
+
+.time-slot-btn.selected {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+} 

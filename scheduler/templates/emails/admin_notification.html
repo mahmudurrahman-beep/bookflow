@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #28a745; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f8f9fa; }
+        .customer-details, .booking-details { background: white; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        
+        /* New customer access info section */
+        .customer-access-info { 
+            background: #e0f2fe; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin: 20px 0;
+            border-left: 4px solid #0369a1;
+        }
+        .customer-access-info h4 { 
+            margin: 0 0 10px; 
+            color: #0369a1; 
+        }
+        .customer-access-info p { 
+            margin: 5px 0; 
+        }
+        .customer-access-info .note { 
+            margin: 10px 0 0; 
+            font-size: 13px; 
+            color: #075985;
+            font-style: italic;
+        }
+        
+        .button {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>New Booking Alert!</h1>
+        </div>
+        <div class="content">
+            <p>A new booking has been made:</p>
+            
+            <div class="customer-details">
+                <h3>Customer Information</h3>
+                <p><strong>Name:</strong> {{ customer_name }}</p>
+                <p><strong>Phone:</strong> {{ customer_phone }}</p>
+                <p><strong>Email:</strong> {{ customer_email }}</p>
+            </div>
+            
+            <!-- New customer access info section -->
+            <div class="customer-access-info">
+                <h4>📋 Customer Access Info</h4>
+                <p><strong>Booking ID:</strong> #{{ booking_id }}</p>
+                <p><strong>Customer Phone:</strong> {{ customer_phone }}</p>
+                <p><strong>Customer Email:</strong> {{ customer_email }}</p>
+                <p class="note">Customer will use Booking ID + Phone to access their booking via the lookup page</p>
+                <p style="margin-top: 10px;">
+                    <a href="{{ site_url }}/lookup/" style="color: #0369a1;">Customer Lookup Page →</a>
+                </p>
+            </div>
+            
+            <div class="booking-details">
+                <h3>Booking Details</h3>
+                <p><strong>Booking ID:</strong> #{{ booking_id }}</p>
+                <p><strong>Service:</strong> {{ service }}</p>
+                <p><strong>Staff:</strong> {{ staff }}</p>
+                <p><strong>Date:</strong> {{ date }}</p>
+                <p><strong>Time:</strong> {{ time }}</p>
+                <p><strong>Duration:</strong> {{ duration }} minutes</p>
+            </div>
+            
+            <p style="text-align: center; margin-top: 30px;">
+                <a href="{{ admin_link }}" class="button">View in Admin</a>
+            </p>
+            <p style="text-align: center; margin-top: 10px;">
+                <a href="{{ site_url }}/booking/{{ booking_id }}/status/" style="color: #666;">View Customer Status Page</a>
+            </p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2026 BookFlow. All rights reserved.</p>
+            <p>Booking System v1.0</p>
+        </div>
+    </div>
+</body>
+</html> 

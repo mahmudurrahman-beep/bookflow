@@ -1,0 +1,79 @@
+{% extends "scheduler/base.html" %}
+{% block title %}Booking #{{ booking.id }} - BookFlow{% endblock %}
+{% block extra_css %}
+<style>
+.status-wrap{max-width:700px;margin:0 auto}
+.status-header{background:var(--navy);border-radius:var(--radius);padding:1.75rem 2rem;margin-bottom:1.5rem;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+.status-header h1{color:var(--cream);font-size:1.75rem}
+.status-header p{color:rgba(249,246,240,.55);font-size:.85rem;margin-top:.25rem}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.db{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
+.db .lbl{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--slate);margin-bottom:.3rem}
+.db .val{font-size:1rem;color:var(--navy);font-weight:500}
+.db .val.lg{font-size:1.1rem;font-family:'Instrument Serif',serif}
+.action-zone{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem}
+.action-zone h3{font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--slate);margin-bottom:1rem}
+.action-row{display:flex;gap:.75rem;flex-wrap:wrap}
+.timeline-item{display:flex;gap:.75rem;align-items:flex-start;padding:.75rem 0;border-bottom:1px solid var(--border)}
+.timeline-item:last-child{border-bottom:none}
+.tl-dot{width:10px;height:10px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:.3rem}
+.tl-text{font-size:.85rem;color:var(--slate)}
+.tl-text strong{color:var(--navy)}
+@media(max-width:600px){.detail-grid{grid-template-columns:1fr}.status-header{flex-direction:column}}
+</style>
+{% endblock %}
+{% block content %}
+<div class="status-wrap">
+  <div class="status-header">
+    <div>
+      <h1>Booking #{{ booking.id }}</h1>
+      <p>{{ booking.service.name }} with {{ booking.staff.name }}</p>
+    </div>
+    <span class="badge badge-{{ booking.status }}">{{ booking.get_status_display }}</span>
+  </div>
+
+  <div class="detail-grid">
+    <div class="db"><div class="lbl">Service</div><div class="val lg">{{ booking.service.name }}</div></div>
+    <div class="db"><div class="lbl">Staff</div><div class="val lg">{{ booking.staff.name }}</div></div>
+    <div class="db"><div class="lbl">Date</div><div class="val">{{ booking.start_datetime|date:"l, F j, Y" }}</div></div>
+    <div class="db"><div class="lbl">Time</div><div class="val">{{ booking.start_datetime|date:"g:i A" }}</div></div>
+    <div class="db"><div class="lbl">Duration</div><div class="val">{{ booking.service.duration_minutes }} minutes</div></div>
+    <div class="db"><div class="lbl">Status</div><div class="val"><span class="badge badge-{{ booking.status }}">{{ booking.get_status_display }}</span></div></div>
+    <div class="db"><div class="lbl">Name</div><div class="val">{{ booking.customer_name }}</div></div>
+    <div class="db"><div class="lbl">Phone</div><div class="val">{{ booking.customer_phone }}</div></div>
+  </div>
+
+  {% if can_cancel or can_reschedule %}
+  <div class="action-zone">
+    <h3>Manage Booking</h3>
+    <div class="action-row">
+      {% if can_reschedule %}
+      <a href="{% url 'reschedule_booking' booking.id %}" class="btn btn-outline">Reschedule</a>
+      {% endif %}
+      {% if can_cancel %}
+      <button onclick="cancelBooking({{ booking.id }})" class="btn btn-danger">Cancel Booking</button>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  {% if booking.admin_note %}
+  <div class="db" style="margin-bottom:1.5rem">
+    <div class="lbl">Note from staff</div>
+    <div class="val" style="margin-top:.35rem;font-style:italic;color:var(--slate)">{{ booking.admin_note }}</div>
+  </div>
+  {% endif %}
+
+  <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+    <a href="{% url 'lookup_booking' %}" class="btn btn-outline">Look up another booking</a>
+    <a href="/book/" class="btn btn-gold">Book again</a>
+  </div>
+</div>
+<script>
+function cancelBooking(id){
+  if(!confirm('Are you sure you want to cancel this booking?')) return;
+  fetch('/api/cancel-booking/'+id+'/',{method:'POST',headers:{'X-CSRFToken':document.cookie.match(/csrftoken=([^;]+)/)[1]}})
+    .then(r=>r.json()).then(d=>{if(d.success)location.reload();else alert('Error: '+d.error);});
+}
+</script>
+{% endblock %}

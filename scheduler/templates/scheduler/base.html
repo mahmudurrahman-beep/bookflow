@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookFlow — {% block title %}Appointments{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'scheduler/styles.css' %}">
+    <style>
+        :root {
+            --navy:   #0f1c2e;
+            --cream:  #f9f6f0;
+            --gold:   #c9963a;
+            --gold-light: #f0d9aa;
+            --slate:  #4a5568;
+            --green:  #2d6a4f;
+            --red:    #c0392b;
+            --border: #e8e2d9;
+            --card-bg: #ffffff;
+            --radius: 12px;
+            --shadow: 0 2px 20px rgba(15,28,46,0.08);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--cream);
+            color: var(--navy);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        h1,h2,h3,h4,h5 {
+            font-family: 'Instrument Serif', serif;
+            font-weight: 400;
+            line-height: 1.2;
+        }
+
+        /* ── NAVBAR ─────────────────────────────── */
+        nav {
+            background: var(--navy);
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(201,150,58,0.2);
+        }
+        .nav-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+        .nav-brand {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.5rem;
+            color: var(--cream);
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+        .nav-brand span { color: var(--gold); }
+        .nav-links { display: flex; align-items: center; gap: 0.25rem; }
+        .nav-links a, .nav-links button {
+            color: rgba(249,246,240,0.75);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 0.4rem 0.9rem;
+            border-radius: 6px;
+            transition: color 0.2s, background 0.2s;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: 'Outfit', sans-serif;
+        }
+        .nav-links a:hover, .nav-links button:hover {
+            color: var(--cream);
+            background: rgba(255,255,255,0.08);
+        }
+        .nav-links a.active { color: var(--gold); }
+        .nav-cta {
+            background: var(--gold) !important;
+            color: var(--navy) !important;
+            font-weight: 600 !important;
+            padding: 0.4rem 1.1rem !important;
+        }
+        .nav-cta:hover { background: #b8842e !important; }
+        .nav-hamburger {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+        }
+        .nav-hamburger span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: var(--cream);
+            margin: 5px 0;
+            transition: all 0.3s;
+        }
+
+        /* ── MAIN ───────────────────────────────── */
+        main {
+            flex: 1;
+            max-width: 1100px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2.5rem 1.5rem;
+        }
+
+        /* ── ALERTS / MESSAGES ──────────────────── */
+        .messages { margin-bottom: 1.5rem; }
+        .msg {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.25rem;
+            border-radius: var(--radius);
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .msg-success { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+        .msg-error   { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+        .msg-warning { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+        .msg-info    { background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd; }
+
+        /* ── CARDS ──────────────────────────────── */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--navy);
+            color: var(--cream);
+        }
+        .card-header h2, .card-header h3 {
+            font-size: 1.5rem;
+            color: var(--cream);
+        }
+        .card-body { padding: 2rem; }
+
+        /* ── FORM ELEMENTS ──────────────────────── */
+        .form-group { margin-bottom: 1.25rem; }
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--slate);
+            margin-bottom: 0.4rem;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            color: var(--navy);
+            background: #fff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(201,150,58,0.15);
+        }
+        select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%234a5568' d='M1 1l5 5 5-5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 1rem center; padding-right: 2.5rem; }
+        select:disabled, input:disabled { background: #f5f3ee; color: #aaa; cursor: not-allowed; }
+        .hint { font-size: 0.78rem; color: var(--slate); margin-top: 0.3rem; }
+
+        /* ── BUTTONS ────────────────────────────── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            padding: 0.7rem 1.5rem;
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: var(--navy); color: var(--cream); }
+        .btn-primary:hover { background: #1a2d45; }
+        .btn-gold { background: var(--gold); color: var(--navy); }
+        .btn-gold:hover { background: #b8842e; }
+        .btn-outline { background: transparent; color: var(--navy); border: 1.5px solid var(--border); }
+        .btn-outline:hover { border-color: var(--navy); background: var(--cream); }
+        .btn-danger { background: #fee2e2; color: var(--red); border: 1px solid #fca5a5; }
+        .btn-danger:hover { background: #fecaca; }
+        .btn-full { width: 100%; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* ── DIVIDER ────────────────────────────── */
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 1.75rem 0;
+        }
+
+        /* ── FOOTER ─────────────────────────────── */
+        footer {
+            background: var(--navy);
+            color: rgba(249,246,240,0.45);
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.8rem;
+        }
+        footer a { color: var(--gold); text-decoration: none; }
+
+        /* ── STATUS BADGES ──────────────────────── */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .badge-booked    { background: #fef9c3; color: #854d0e; }
+        .badge-confirmed { background: #d1fae5; color: #065f46; }
+        .badge-completed { background: #e5e7eb; color: #374151; }
+        .badge-cancelled { background: #fee2e2; color: #991b1b; }
+        .badge-no_show   { background: #ffe4e6; color: #9f1239; }
+
+        /* ── RESPONSIVE ─────────────────────────── */
+        @media (max-width: 768px) {
+            .nav-links { display: none; flex-direction: column; position: absolute; top: 64px; left: 0; right: 0; background: var(--navy); padding: 1rem; border-bottom: 1px solid rgba(201,150,58,0.2); }
+            .nav-links.open { display: flex; }
+            .nav-hamburger { display: block; }
+            main { padding: 1.5rem 1rem; }
+            .card-body { padding: 1.25rem; }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<nav>
+    <div class="nav-inner">
+        <a class="nav-brand" href="/">Book<span>Flow</span></a>
+        <button class="nav-hamburger" onclick="this.nextElementSibling.classList.toggle('open')" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="{% url 'lookup_booking' %}">Find Booking</a>
+            {% if user.is_authenticated %} 
+                <form action="/admin/logout/" method="post" style="display:inline">
+                    {% csrf_token %}
+                    <button type="submit">Logout</button>
+                </form>
+            {% else %}
+                <a href="/admin/login/?next={{ request.path }}">Staff Login</a>
+            {% endif %}
+            <a href="/book/" class="nav-cta">Book Now</a>
+        </div>
+    </div>
+</nav>
+
+<main>
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="msg msg-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+</main>
+
+<footer>
+    <p>&copy; 2026 BookFlow &mdash; Appointment Scheduling &nbsp;|&nbsp; <a href="{% url 'lookup_booking' %}">Find Booking</a></p>
+</footer>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

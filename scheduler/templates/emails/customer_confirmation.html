@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #007bff; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f8f9fa; }
+        .booking-details { background: white; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+        .button { background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; }
+        .phone-note {
+            background: #fef3c7;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #fbbf24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Booking Confirmed!</h1>
+        </div>
+        <div class="content">
+            <h2>Hello {{ customer_name }},</h2>
+            <p>Your booking has been successfully confirmed. Here are the details:</p>
+            
+            <div class="booking-details">
+                <h3>Booking #{{ booking_id }}</h3>
+                <p><strong>Service:</strong> {{ service }}</p>
+                <p><strong>Staff:</strong> {{ staff }}</p>
+                <p><strong>Date:</strong> {{ date }}</p>
+                <p><strong>Time:</strong> {{ time }}</p>
+                <p><strong>Duration:</strong> {{ duration }} minutes</p>
+            </div>
+
+            <!-- New email note section -->
+            <div class="phone-note">
+                <strong style="color: #854d0e;">📧 Email Used:</strong>
+                <p style="margin: 5px 0 0; font-size: 16px;">{{ customer_email }}</p>
+                <p style="margin: 5px 0 0; font-size: 13px; color: #854d0e;">
+                    All booking updates will be sent to this email address
+                </p>
+            </div>
+            
+            <p>Please arrive 5 minutes before your scheduled time.</p>
+            <p>If you need to reschedule or cancel, please contact us.</p>
+            
+            <p style="text-align: center; margin-top: 30px;">
+                <a href="{{ site_url }}/booking/{{ booking_id }}" class="button">View Booking</a>
+            </p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2026 BookFlow. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html> 

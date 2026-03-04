@@ -1,0 +1,84 @@
+{% extends "scheduler/base.html" %}
+{% block title %}Booking Confirmed - BookFlow{% endblock %}
+{% block extra_css %}
+<style>
+.confirm-wrap{max-width:680px;margin:0 auto}
+.success-banner{background:var(--navy);border-radius:var(--radius);padding:2rem;text-align:center;margin-bottom:1.5rem;position:relative;overflow:hidden}
+.success-banner::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(201,150,58,.25),transparent 70%);pointer-events:none}
+.check-icon{width:56px;height:56px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.5rem;position:relative;z-index:1}
+.success-banner h1{color:var(--cream);font-size:1.75rem;margin-bottom:.35rem;position:relative;z-index:1}
+.success-banner p{color:rgba(249,246,240,.6);font-size:.9rem;position:relative;z-index:1}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.detail-block{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
+.detail-block .label{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--slate);margin-bottom:.3rem}
+.detail-block .value{font-size:1rem;color:var(--navy);font-weight:500}
+.detail-block .value.large{font-size:1.2rem;font-family:'Instrument Serif',serif}
+.id-box{background:var(--navy);border-radius:var(--radius);padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem}
+.id-box .label{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:rgba(249,246,240,.5)}
+.id-box .id-val{font-size:1.75rem;color:var(--gold);font-family:'Instrument Serif',serif;letter-spacing:1px}
+.id-box p{font-size:.78rem;color:rgba(249,246,240,.4);margin-top:.25rem}
+.actions{display:flex;gap:.75rem;flex-wrap:wrap}
+@media(max-width:600px){.detail-grid{grid-template-columns:1fr}}
+</style>
+{% endblock %}
+{% block content %}
+<div class="confirm-wrap">
+  <div class="success-banner">
+    <div class="check-icon">✓</div>
+    <h1>You're booked!</h1>
+    <p>A confirmation has been sent to {{ booking.customer_email }}</p>
+  </div>
+
+  <div class="id-box">
+    <div>
+      <div class="label">Your Booking ID</div>
+      <div class="id-val">#{{ booking.id }}</div>
+      <p>Save this — you'll need it to look up or manage your booking.</p>
+    </div>
+    <a href="{% url 'booking_status' booking.id %}" class="btn btn-gold">View Status</a>
+  </div>
+
+  <div class="detail-grid">
+    <div class="detail-block">
+      <div class="label">Service</div>
+      <div class="value large">{{ booking.service.name }}</div>
+    </div>
+    <div class="detail-block">
+      <div class="label">With</div>
+      <div class="value large">{{ booking.staff.name }}</div>
+    </div>
+    <div class="detail-block">
+      <div class="label">Date</div>
+      <div class="value">{{ booking.start_datetime|date:"l, F j, Y" }}</div>
+    </div>
+    <div class="detail-block">
+      <div class="label">Time</div>
+      <div class="value">{{ booking.start_datetime|date:"g:i A" }}</div>
+    </div>
+    <div class="detail-block">
+      <div class="label">Duration</div>
+      <div class="value">{{ booking.service.duration_minutes }} minutes</div>
+    </div>
+    <div class="detail-block">
+      <div class="label">Status</div>
+      <div class="value"><span class="badge badge-booked">Booked</span></div>
+    </div>
+  </div>
+
+  <div class="detail-block" style="margin-bottom:1.5rem">
+    <div class="label">Contact details</div>
+    <div class="value" style="margin-top:.35rem">{{ booking.customer_name }} &nbsp;&middot;&nbsp; {{ booking.customer_phone }}{% if booking.customer_email %} &nbsp;&middot;&nbsp; {{ booking.customer_email }}{% endif %}</div>
+  </div>
+
+  <div class="actions">
+    <a href="{% url 'booking_status' booking.id %}" class="btn btn-primary">View Booking Status</a>
+    <a href="/book/" class="btn btn-outline">Book Another</a>
+    <a href="/" class="btn btn-outline">Home</a>
+  </div>
+</div>
+<script>
+function copyStatusLink(){
+  navigator.clipboard.writeText(window.location.origin+'/booking/{{ booking.id }}/status/').then(function(){alert('Link copied!');});
+}
+</script>
+{% endblock %}

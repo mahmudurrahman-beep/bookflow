@@ -1,0 +1,84 @@
+{% extends "scheduler/base.html" %}
+{% load static %}
+{% block title %}Reschedule Booking - BookFlow{% endblock %}
+{% block extra_css %}
+<style>
+.reschedule-wrap{max-width:600px;margin:0 auto}
+.current-appt{background:var(--navy);border-radius:var(--radius);padding:1.5rem;margin-bottom:1.5rem;position:relative;overflow:hidden}
+.current-appt::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 100% 0%,rgba(201,150,58,.2),transparent 60%);pointer-events:none}
+.current-appt .tag{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:.5rem}
+.current-appt h3{color:var(--cream);font-size:1.2rem;margin-bottom:.25rem}
+.current-appt p{color:rgba(249,246,240,.55);font-size:.875rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:600px){.two-col{grid-template-columns:1fr}}
+</style>
+{% endblock %}
+{% block content %}
+<div class="reschedule-wrap">
+  <h1 style="font-size:2rem;margin-bottom:1.5rem">Reschedule Booking</h1>
+
+  <div class="current-appt">
+    <div class="tag">Current appointment</div>
+    <h3>{{ booking.service.name }} with {{ booking.staff.name }}</h3>
+    <p>{{ booking.start_datetime|date:"l, F j, Y" }} at {{ booking.start_datetime|date:"g:i A" }}</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h3>Choose a new time</h3></div>
+    <div class="card-body">
+      <form id="rescheduleForm">
+        {% csrf_token %}
+        <div class="two-col">
+          <div class="form-group">
+            <label for="date">New date</label>
+            <input type="date" id="date" required min="{{ today|date:'Y-m-d' }}">
+          </div>
+          <div class="form-group">
+            <label for="time">Available time</label>
+            <select id="time" required disabled><option value="">Select a date first</option></select>
+          </div>
+        </div>
+        <div style="background:#fef9c3;border:1px solid #fcd34d;border-radius:8px;padding:.875rem 1.1rem;font-size:.83rem;color:#92400e;margin-bottom:1.25rem">
+          Your current booking stays reserved until you confirm a new time.
+        </div>
+        <div style="display:flex;gap:.75rem;flex-wrap:wrap">
+          <button type="submit" class="btn btn-gold" id="submitBtn" disabled>Confirm Reschedule</button>
+          <a href="{% url 'booking_status' booking.id %}" class="btn btn-outline">Cancel</a>
+        </div>
+      </form>
+      <div id="message" style="margin-top:1rem"></div>
+    </div>
+  </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  var dateInput=document.getElementById('date'),timeSelect=document.getElementById('time'),submitBtn=document.getElementById('submitBtn'),form=document.getElementById('rescheduleForm');
+  var tomorrow=new Date();tomorrow.setDate(tomorrow.getDate()+1);
+  dateInput.min=tomorrow.toISOString().split('T')[0];
+  dateInput.addEventListener('change',function(){
+    var date=this.value,bookingId={{ booking.id }};
+    timeSelect.innerHTML='<option value="">Loading...</option>';timeSelect.disabled=true;submitBtn.disabled=true;
+    fetch('/api/slots/?booking_id='+bookingId+'&date='+date)
+      .then(function(r){return r.json();}).then(function(data){
+        if(data.slots&&data.slots.length>0){
+          timeSelect.innerHTML='<option value="">Select a time</option>';
+          data.slots.forEach(function(s){var o=document.createElement('option');o.value=s;o.textContent=s;timeSelect.appendChild(o);});
+          timeSelect.disabled=false;
+        } else {timeSelect.innerHTML='<option value="">No slots available</option>';}
+      });
+  });
+  timeSelect.addEventListener('change',function(){submitBtn.disabled=!this.value;});
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var bookingId={{ booking.id }},date=dateInput.value,time=timeSelect.value;
+    if(!date||!time){document.getElementById('message').innerHTML='<div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:8px;padding:.875rem 1.1rem;font-size:.88rem;color:#991b1b">Please select both date and time.</div>';return;}
+    submitBtn.disabled=true;submitBtn.textContent='Processing...';
+    fetch('/api/reschedule-booking/'+bookingId+'/',{method:'POST',headers:{'Content-Type':'application/json','X-CSRFToken':'{{ csrf_token }}'},body:JSON.stringify({new_date:date,new_time:time})})
+      .then(function(r){return r.json();}).then(function(data){
+        if(data.success){document.getElementById('message').innerHTML='<div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:8px;padding:.875rem 1.1rem;font-size:.88rem;color:#065f46">Rescheduled! Redirecting...</div>';setTimeout(function(){window.location.href='/booking/'+bookingId+'/status/';},1800);}
+        else{document.getElementById('message').innerHTML='<div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:8px;padding:.875rem 1.1rem;font-size:.88rem;color:#991b1b">Error: '+data.error+'</div>';submitBtn.disabled=false;submitBtn.textContent='Confirm Reschedule';}
+      });
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "scheduler/base.html" %}
+{% block title %}Find Your Booking - BookFlow{% endblock %}
+{% block extra_css %}
+<style>
+.lookup-wrap{max-width:520px;margin:0 auto}
+.lookup-wrap h1{font-size:2rem;margin-bottom:.5rem}
+.lookup-wrap .sub{color:var(--slate);margin-bottom:2rem}
+.help-card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;margin-top:1.5rem}
+.help-card h3{font-size:1rem;margin-bottom:.75rem}
+.contact-row{display:flex;align-items:center;gap:.75rem;padding:.5rem 0;font-size:.875rem;color:var(--slate)}
+.contact-row .icon{width:32px;height:32px;background:var(--cream);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+</style>
+{% endblock %}
+{% block content %}
+<div class="lookup-wrap">
+  <h1>Find your booking</h1>
+  <p class="sub">Enter your booking ID and phone number to view your status.</p>
+
+  <div class="card">
+    <div class="card-header"><h3>Look up booking</h3></div>
+    <div class="card-body">
+      <form method="POST" action="{% url 'lookup_booking' %}">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="booking_id">Booking ID</label>
+          <input type="text" id="booking_id" name="booking_id" placeholder="e.g. 42" required>
+          <p class="hint">Found in your confirmation email</p>
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone number</label>
+          <input type="tel" id="phone" name="phone" placeholder="Number used when booking" required>
+        </div>
+        <button type="submit" class="btn btn-gold btn-full">View Booking Status &rarr;</button>
+      </form>
+      <div class="divider"></div>
+      <p style="text-align:center;font-size:.875rem;color:var(--slate)">Don't have a booking yet? <a href="{% url 'book' %}" style="color:var(--navy);font-weight:600">Book now &rarr;</a></p>
+    </div>
+  </div>
+
+  <div class="help-card">
+    <h3>Need help?</h3>
+    <div class="contact-row"><span class="icon">📞</span><span>Phone: this number</span></div> 
+    <div class="contact-row"><span class="icon">✉️</span><span>Email: this email</span></div> 
+  </div>
+</div>
+{% endblock %}

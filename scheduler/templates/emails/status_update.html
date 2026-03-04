@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #ffc107; color: black; padding: 20px; text-align: center; }
+        .content { padding: 20px; background: #f8f9fa; }
+        .booking-details { background: white; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Booking Status Updated</h1>
+        </div>
+        <div class="content">
+            <h2>Hello {{ customer_name }},</h2>
+            <p>Your booking status has been updated:</p>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <span style="background: #dc3545; color: white; padding: 5px 10px; border-radius: 3px;">{{ old_status }}</span>
+                <span style="font-size: 20px; margin: 0 10px;">→</span>
+                <span style="background: #28a745; color: white; padding: 5px 10px; border-radius: 3px;">{{ new_status }}</span>
+            </div>
+            
+            <div class="booking-details">
+                <h3>Booking #{{ booking_id }}</h3>
+                <p><strong>Service:</strong> {{ service }}</p>
+                <p><strong>Staff:</strong> {{ staff }}</p>
+                <p><strong>Date:</strong> {{ date }}</p>
+                <p><strong>Time:</strong> {{ time }}</p>
+            </div>
+            
+            <p>If you have any questions, please contact us.</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2026 BookFlow. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

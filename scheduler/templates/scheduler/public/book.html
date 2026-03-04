@@ -1,0 +1,84 @@
+{% extends "scheduler/base.html" %}
+{% load static %}
+{% block title %}Book Appointment - BookFlow{% endblock %}
+{% block extra_css %}
+<style>
+.page-header{margin-bottom:2rem}
+.page-header p{color:var(--slate);margin-top:.35rem}
+.booking-layout{display:grid;grid-template-columns:1fr 300px;gap:2rem;align-items:start}
+.bcard{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:1.25rem;overflow:hidden}
+.bcard-head{padding:1.25rem 1.75rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.75rem}
+.sn{width:26px;height:26px;background:var(--navy);color:var(--cream);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;flex-shrink:0}
+.bcard-head h2{font-size:1rem;font-family:Outfit,sans-serif;font-weight:600}
+.bcard-body{padding:1.5rem 1.75rem}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.sumcard{background:var(--navy);border-radius:var(--radius);padding:1.5rem;position:sticky;top:84px}
+.sumcard h3{color:var(--cream);font-size:.85rem;margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,.1);font-family:Outfit,sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.sr{display:flex;justify-content:space-between;gap:.5rem;margin-bottom:.8rem}
+.sr .lb{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:rgba(249,246,240,.4);flex-shrink:0;padding-top:1px}
+.sr .vl{font-size:.85rem;color:var(--cream);text-align:right}
+.ph{color:rgba(249,246,240,.25)!important;font-style:italic}
+.al{padding:.875rem 1.25rem;border-radius:8px;font-size:.88rem;font-weight:500;margin-top:1rem}
+.al-w{background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
+.al-d{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+.al-s{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7}
+@media(max-width:900px){.booking-layout{grid-template-columns:1fr}.sumcard{order:-1;position:static}}
+@media(max-width:600px){.two-col{grid-template-columns:1fr}}
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 style="font-size:2rem">Book an Appointment</h1>
+  <p>Select your service and a time that works for you.</p>
+</div>
+<div class="booking-layout">
+  <div>
+    <div class="bcard">
+      <div class="bcard-head"><span class="sn">1</span><h2>Service &amp; Staff</h2></div>
+      <div class="bcard-body">
+        <div class="form-group"><label for="service">Service</label><select id="service" required><option value="">Choose a service...</option></select></div>
+        <div class="form-group"><label for="staff">Staff preference</label><select id="staff" disabled><option value="">Select a service first</option></select><p class="hint">Leave as Any to see all open slots.</p></div>
+      </div>
+    </div>
+    <div class="bcard">
+      <div class="bcard-head"><span class="sn">2</span><h2>Date &amp; Time</h2></div>
+      <div class="bcard-body">
+        <div class="two-col">
+          <div class="form-group"><label for="date">Date</label><input type="date" id="date" required disabled min="{{ today|date:'Y-m-d' }}"></div>
+          <div class="form-group"><label for="time">Available time</label><select id="time" required disabled><option value="">Select date first</option></select></div>
+        </div>
+      </div>
+    </div>
+    <div class="bcard">
+      <div class="bcard-head"><span class="sn">3</span><h2>Your Information</h2></div>
+      <div class="bcard-body">
+        <form id="bookingForm">
+          {% csrf_token %}
+          <div class="two-col">
+            <div class="form-group"><label for="name">Full name</label><input type="text" id="name" placeholder="Jane Smith" required></div>
+            <div class="form-group"><label for="phone">Phone number</label><input type="tel" id="phone" placeholder="+1 555 000 0000" required></div>
+          </div>
+          <div class="form-group"><label for="email">Email address</label><input type="email" id="email" name="email" placeholder="jane@example.com" required><p class="hint">Confirmation and booking ID sent here.</p></div>
+          <button type="submit" class="btn btn-gold btn-full" style="margin-top:.75rem">Confirm Booking &rarr;</button>
+        </form>
+        <div id="message"></div>
+      </div>
+    </div>
+  </div>
+  <div class="sumcard">
+    <h3>Your Booking</h3>
+    <div id="ss" class="sr"><span class="lb">Service</span><span class="vl ph">Not selected</span></div>
+    <div id="sf" class="sr"><span class="lb">Staff</span><span class="vl ph">-</span></div>
+    <div id="sd" class="sr"><span class="lb">Date</span><span class="vl ph">-</span></div>
+    <div id="st" class="sr"><span class="lb">Time</span><span class="vl ph">-</span></div>
+    <div id="su" class="sr"><span class="lb">Duration</span><span class="vl ph">-</span></div>
+  </div>
+</div>
+<script src="{% static 'scheduler/booking.js' %}"></script>
+<script>
+document.getElementById("service").addEventListener("change",function(){var o=this.options[this.selectedIndex];document.querySelector("#ss .vl").textContent=o.value?o.text:"-";document.querySelector("#su .vl").textContent=o.dataset.duration?o.dataset.duration+" min":"-";});
+document.getElementById("staff").addEventListener("change",function(){document.querySelector("#sf .vl").textContent=this.options[this.selectedIndex].text||"-";});
+document.getElementById("date").addEventListener("change",function(){if(this.value){var d=new Date(this.value+"T00:00:00");document.querySelector("#sd .vl").textContent=d.toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});}});
+document.getElementById("time").addEventListener("change",function(){document.querySelector("#st .vl").textContent=this.value||"-";});
+</script>
+{% endblock %}
