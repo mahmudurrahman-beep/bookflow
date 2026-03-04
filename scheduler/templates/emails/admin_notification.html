@@ -1,94 +1,127 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-        .header { background: #28a745; color: white; padding: 20px; text-align: center; }
-        .content { padding: 20px; background: #f8f9fa; }
-        .customer-details, .booking-details { background: white; padding: 15px; border-radius: 5px; margin: 20px 0; }
-        
-        /* New customer access info section */
-        .customer-access-info { 
-            background: #e0f2fe; 
-            padding: 15px; 
-            border-radius: 8px; 
-            margin: 20px 0;
-            border-left: 4px solid #0369a1;
-        }
-        .customer-access-info h4 { 
-            margin: 0 0 10px; 
-            color: #0369a1; 
-        }
-        .customer-access-info p { 
-            margin: 5px 0; 
-        }
-        .customer-access-info .note { 
-            margin: 10px 0 0; 
-            font-size: 13px; 
-            color: #075985;
-            font-style: italic;
-        }
-        
-        .button {
-            background: #28a745;
-            color: white;
-            padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            display: inline-block;
-        }
-        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f0ece4; font-family: 'Outfit', Arial, sans-serif; color: #0f1c2e; -webkit-font-smoothing: antialiased; }
+    .wrap { max-width: 600px; margin: 32px auto; background: #f0ece4; padding: 0 16px 40px; }
+    /* Header */
+    .hd { background: #0f1c2e; border-radius: 12px 12px 0 0; padding: 32px 40px; text-align: center; }
+    .hd .brand { font-size: 22px; font-weight: 600; color: #f9f6f0; letter-spacing: 0.5px; }
+    .hd .brand span { color: #c9963a; }
+    .hd .tagline { font-size: 12px; color: rgba(249,246,240,0.4); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.1em; }
+    /* Hero band */
+    .hero-band { background: #c9963a; padding: 28px 40px; text-align: center; }
+    .hero-band h1 { font-size: 22px; font-weight: 600; color: #0f1c2e; margin-bottom: 4px; }
+    .hero-band p { font-size: 13px; color: rgba(15,28,46,0.65); }
+    /* Body */
+    .body { background: #ffffff; padding: 32px 40px; }
+    .greeting { font-size: 16px; color: #0f1c2e; margin-bottom: 20px; }
+    /* Detail table */
+    .detail-box { background: #f9f6f0; border: 1px solid #e8e2d9; border-radius: 10px; overflow: hidden; margin: 20px 0; }
+    .detail-row { display: flex; justify-content: space-between; padding: 11px 18px; border-bottom: 1px solid #e8e2d9; font-size: 14px; }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-row .lbl { color: #4a5568; font-weight: 500; }
+    .detail-row .val { color: #0f1c2e; font-weight: 600; text-align: right; }
+    /* ID badge */
+    .id-badge { background: #0f1c2e; border-radius: 10px; padding: 18px 24px; margin: 20px 0; display: flex; align-items: center; justify-content: space-between; }
+    .id-badge .id-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(249,246,240,0.45); }
+    .id-badge .id-val { font-size: 26px; color: #c9963a; font-weight: 700; letter-spacing: 1px; }
+    /* Status badge */
+    .status-pill { display: inline-block; padding: 4px 14px; border-radius: 99px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; }
+    .s-booked    { background: #fef9c3; color: #854d0e; }
+    .s-confirmed { background: #d1fae5; color: #065f46; }
+    .s-cancelled { background: #fee2e2; color: #991b1b; }
+    .s-completed { background: #e5e7eb; color: #374151; }
+    .s-no_show   { background: #ffe4e6; color: #9f1239; }
+    .s-rescheduled { background: #dbeafe; color: #1e40af; }
+    /* CTA button */
+    .cta-wrap { text-align: center; margin: 28px 0 8px; }
+    .cta { display: inline-block; background: #0f1c2e; color: #f9f6f0 !important; text-decoration: none; padding: 13px 32px; border-radius: 8px; font-size: 14px; font-weight: 600; letter-spacing: 0.03em; }
+    .cta-gold { background: #c9963a; color: #0f1c2e !important; }
+    /* Info box */
+    .info-box { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 14px 18px; margin: 16px 0; font-size: 13px; color: #0c4a6e; }
+    .info-box strong { display: block; margin-bottom: 4px; color: #075985; }
+    /* Note */
+    .note { font-size: 13px; color: #4a5568; line-height: 1.6; margin: 16px 0; }
+    /* Status change */
+    .status-change { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 20px 0; }
+    .status-change .arrow { font-size: 18px; color: #4a5568; }
+    /* Divider */
+    .div { height: 1px; background: #e8e2d9; margin: 20px 0; }
+    /* Footer */
+    .ft { background: #0f1c2e; border-radius: 0 0 12px 12px; padding: 20px 40px; text-align: center; }
+    .ft p { font-size: 11px; color: rgba(249,246,240,0.35); line-height: 1.8; }
+    .ft a { color: #c9963a; text-decoration: none; }
+    @media (max-width: 480px) {
+      .body, .hero-band, .hd, .ft { padding-left: 20px; padding-right: 20px; }
+      .detail-row { flex-direction: column; gap: 2px; }
+      .detail-row .val { text-align: left; }
+      .id-badge { flex-direction: column; gap: 6px; text-align: center; }
+    }
+  </style>
+
+  <title>New Booking - BookFlow Admin</title>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>New Booking Alert!</h1>
-        </div>
-        <div class="content">
-            <p>A new booking has been made:</p>
-            
-            <div class="customer-details">
-                <h3>Customer Information</h3>
-                <p><strong>Name:</strong> {{ customer_name }}</p>
-                <p><strong>Phone:</strong> {{ customer_phone }}</p>
-                <p><strong>Email:</strong> {{ customer_email }}</p>
-            </div>
-            
-            <!-- New customer access info section -->
-            <div class="customer-access-info">
-                <h4>📋 Customer Access Info</h4>
-                <p><strong>Booking ID:</strong> #{{ booking_id }}</p>
-                <p><strong>Customer Phone:</strong> {{ customer_phone }}</p>
-                <p><strong>Customer Email:</strong> {{ customer_email }}</p>
-                <p class="note">Customer will use Booking ID + Phone to access their booking via the lookup page</p>
-                <p style="margin-top: 10px;">
-                    <a href="{{ site_url }}/lookup/" style="color: #0369a1;">Customer Lookup Page →</a>
-                </p>
-            </div>
-            
-            <div class="booking-details">
-                <h3>Booking Details</h3>
-                <p><strong>Booking ID:</strong> #{{ booking_id }}</p>
-                <p><strong>Service:</strong> {{ service }}</p>
-                <p><strong>Staff:</strong> {{ staff }}</p>
-                <p><strong>Date:</strong> {{ date }}</p>
-                <p><strong>Time:</strong> {{ time }}</p>
-                <p><strong>Duration:</strong> {{ duration }} minutes</p>
-            </div>
-            
-            <p style="text-align: center; margin-top: 30px;">
-                <a href="{{ admin_link }}" class="button">View in Admin</a>
-            </p>
-            <p style="text-align: center; margin-top: 10px;">
-                <a href="{{ site_url }}/booking/{{ booking_id }}/status/" style="color: #666;">View Customer Status Page</a>
-            </p>
-        </div>
-        <div class="footer">
-            <p>&copy; 2026 BookFlow. All rights reserved.</p>
-            <p>Booking System v1.0</p>
-        </div>
+<div class="wrap">
+
+  <div class="hd">
+    <div class="brand">Book<span>Flow</span></div>
+    <div class="tagline">Admin Notification</div>
+  </div>
+
+  <div class="hero-band" style="background:#0f1c2e">
+    <h1 style="color:#c9963a">New Booking Received</h1>
+    <p style="color:rgba(249,246,240,0.55)">A customer has just booked an appointment</p>
+  </div>
+
+  <div class="body">
+
+    <div class="id-badge">
+      <div>
+        <div class="id-label">Booking ID</div>
+        <div class="id-val">#{{ booking_id }}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="id-label">Status</div>
+        <span class="status-pill s-booked" style="margin-top:6px;display:inline-block">Booked</span>
+      </div>
     </div>
+
+    <div class="detail-box">
+      <div class="detail-row"><span class="lbl">Customer</span><span class="val">{{ customer_name }}</span></div>
+      <div class="detail-row"><span class="lbl">Phone</span><span class="val">{{ customer_phone }}</span></div>
+      <div class="detail-row"><span class="lbl">Email</span><span class="val">{{ customer_email }}</span></div>
+    </div>
+
+    <div class="detail-box">
+      <div class="detail-row"><span class="lbl">Service</span><span class="val">{{ service }}</span></div>
+      <div class="detail-row"><span class="lbl">Staff</span><span class="val">{{ staff }}</span></div>
+      <div class="detail-row"><span class="lbl">Date</span><span class="val">{{ date }}</span></div>
+      <div class="detail-row"><span class="lbl">Time</span><span class="val">{{ time }}</span></div>
+      <div class="detail-row"><span class="lbl">Duration</span><span class="val">{{ duration }} minutes</span></div>
+    </div>
+
+    <div class="info-box">
+      <strong>&#128101; Customer Access</strong>
+      Customer uses Booking ID <strong>#{{ booking_id }}</strong> and phone <strong>{{ customer_phone }}</strong> to view or manage their booking.
+    </div>
+
+    <div class="cta-wrap" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+      <a href="{{ admin_link }}" class="cta cta-gold">Manage in Admin &rarr;</a>
+      <a href="{{ status_url }}" class="cta">Customer Status Page</a>
+    </div>
+
+  </div>
+
+  <div class="ft">
+    <p>&copy; 2026 BookFlow Admin &nbsp;&middot;&nbsp; <a href="{{ site_url }}">{{ site_url }}</a></p>
+  </div>
+
+</div>
 </body>
-</html> 
+</html>
