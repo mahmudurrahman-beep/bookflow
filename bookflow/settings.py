@@ -124,3 +124,4 @@ LOGGING = {
     },
 } 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' 
+EMAIL_TIMEOUT = 5
