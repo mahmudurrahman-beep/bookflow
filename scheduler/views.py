@@ -91,26 +91,70 @@ def api_slots(request):
     except (Service.DoesNotExist, Staff.DoesNotExist, ValueError) as e:
         return JsonResponse({'error': str(e)}, status=400)
 
+def api_available_dates(request):
+    """Return all dates with available slots for a given service/staff combo."""
+    service_id = request.GET.get('service')
+    staff_id = request.GET.get('staff')
+
+    if not service_id:
+        return JsonResponse({'error': 'Missing service parameter'}, status=400)
+
+    try:
+        service = Service.objects.get(id=service_id, is_active=True)
+        settings = BusinessSettings.objects.first()
+        if not settings:
+            settings = BusinessSettings.objects.create()
+
+        max_days = settings.max_days_ahead or 30
+        today = timezone.now().date()
+        available = {}
+
+        if staff_id:
+            staff_list = list(Staff.objects.filter(id=staff_id, is_active=True))
+        else:
+            staff_list = list(Staff.objects.filter(is_active=True))
+
+        for delta in range(0, max_days + 1):
+            target_date = today + timedelta(days=delta)
+            date_str = target_date.strftime('%Y-%m-%d')
+            slots_for_date = []
+
+            for s in staff_list:
+                staff_slots = generate_slots_for_staff(service, s, target_date)
+                if staff_id:
+                    slots_for_date.extend(staff_slots)
+                else:
+                    slots_for_date.extend(
+                        [f"{slot} (with {s.name})" for slot in staff_slots]
+                    )
+
+            if slots_for_date:
+                available[date_str] = slots_for_date
+
+        return JsonResponse({'available': available})
+
+    except (Service.DoesNotExist, Staff.DoesNotExist, ValueError) as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
 def api_public_calendar(request):
     """
-    Returns booking activity for the current month + next month.
+    Returns booking activity counts for the current and next month.
     Only exposes counts per day — no customer details.
     """
+    import calendar as cal_module
     from datetime import date
-    import calendar
 
     today = date.today()
-    # Cover current month and next month
     year  = today.year
     month = today.month
 
-    # Build date range: today → end of next month
     if month == 12:
         end_year, end_month = year + 1, 1
     else:
         end_year, end_month = year, month + 1
 
-    end_day = calendar.monthrange(end_year, end_month)[1]
+    end_day = cal_module.monthrange(end_year, end_month)[1]
     range_end = date(end_year, end_month, end_day)
 
     bookings = Booking.objects.filter(
@@ -119,7 +163,7 @@ def api_public_calendar(request):
         start_datetime__date__lte=range_end,
     ).values('start_datetime', 'status')
 
-    counts = {}  # { "2026-03-10": {"booked": 2, "confirmed": 1} }
+    counts = {}
     for b in bookings:
         d = b['start_datetime'].strftime('%Y-%m-%d')
         if d not in counts:
@@ -129,7 +173,7 @@ def api_public_calendar(request):
     return JsonResponse({
         'counts': counts,
         'today': today.strftime('%Y-%m-%d'),
-    }) 
+    })
 
 def generate_slots_for_staff(service, staff, target_date):
     """Helper function to generate slots for a specific staff member"""
