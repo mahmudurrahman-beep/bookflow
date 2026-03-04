@@ -55,7 +55,7 @@ Thank you for choosing BookFlow!
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[booking.customer_email],
                 html_message=customer_html,
-                fail_silently=False,
+                fail_silently=True,
             )
             logger.info(f"Confirmation email sent to {booking.customer_email} for booking #{booking.id}")
 
@@ -107,7 +107,7 @@ Customer status page: {site_url}/booking/{booking.id}/status/
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[admin_email],
                 html_message=admin_html,
-                fail_silently=False,
+                fail_silently=True,
             )
             logger.info(f"Admin notification sent for booking #{booking.id}")
 
@@ -166,7 +166,7 @@ Thank you for choosing BookFlow!
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[booking.customer_email],
             html_message=html_message,
-            fail_silently=False,
+            fail_silently=True,
         )
         logger.info(f"Status update email sent to {booking.customer_email} for booking #{booking.id}")
 
