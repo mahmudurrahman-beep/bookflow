@@ -51,17 +51,26 @@ class BookingAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at', 'updated_at']
 
     def save_model(self, request, obj, form, change):
-        if change:  # Editing an existing booking
+        if change:
             original = Booking.objects.get(pk=obj.pk)
             old_status = original.status
+            old_start = original.start_datetime
             super().save_model(request, obj, form, change)
-            if old_status != obj.status and obj.customer_email:
-                try:
-                    send_booking_status_update(obj, old_status, obj.status)
-                    self.message_user(request, f"Status update email sent to {obj.customer_email}")
-                except Exception as e:
-                    self.message_user(request, f"Email failed: {e}", level='ERROR')
-        else:  # New booking created via admin
+
+            if obj.customer_email:
+                if old_status != obj.status:
+                    try:
+                        send_booking_status_update(obj, old_status, obj.status)
+                        self.message_user(request, f"Status update email sent to {obj.customer_email}")
+                    except Exception as e:
+                        self.message_user(request, f"Email failed: {e}", level='ERROR')
+                elif old_start != obj.start_datetime:
+                    try:
+                        send_booking_status_update(obj, obj.status, 'rescheduled')
+                        self.message_user(request, f"Reschedule email sent to {obj.customer_email}")
+                    except Exception as e:
+                        self.message_user(request, f"Email failed: {e}", level='ERROR')
+        else:
             super().save_model(request, obj, form, change)
             if obj.customer_email:
                 try:
@@ -105,4 +114,4 @@ class BusinessSettingsAdmin(admin.ModelAdmin):
     """Prevent creating multiple BusinessSettings rows by accident."""
 
     def has_add_permission(self, request):
-        return not BusinessSettings.objects.exists() 
+        return not BusinessSettings.objects.exists()
