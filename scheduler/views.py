@@ -20,8 +20,6 @@ def index(request):
 
 def book(request):
     """Booking page"""
-    from datetime import date, timedelta
-    
     today = date.today()
     max_date = today + timedelta(days=30)  
     
@@ -209,7 +207,6 @@ def generate_slots_for_staff(service, staff, target_date):
         buffer = timedelta(minutes=settings.buffer_minutes)
         duration = timedelta(minutes=service.duration_minutes)
 
-        # ---- FIX: Compute notice_deadline ONCE before the loop ----
         notice_deadline = None
         if settings.min_notice_minutes > 0:
             notice_deadline = timezone.now() + timedelta(minutes=settings.min_notice_minutes)
@@ -231,7 +228,6 @@ def generate_slots_for_staff(service, staff, target_date):
         while current + duration <= end_dt:
             slot_end = current + duration
 
-            # ---- FIX: Check minimum notice OUTSIDE the booking-conflict block ----
             if notice_deadline and current < notice_deadline:
                 current += interval
                 continue
@@ -767,4 +763,4 @@ END:VCALENDAR"""
     
     response = HttpResponse(cal_content, content_type='text/calendar')
     response['Content-Disposition'] = f'attachment; filename=booking_{booking.id}.ics'
-    return response 
+    return response
