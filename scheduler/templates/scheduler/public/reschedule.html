@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded',function(){
   dateInput.addEventListener('change',function(){
     var date=this.value,bookingId={{ booking.id }};
     timeSelect.innerHTML='<option value="">Loading...</option>';timeSelect.disabled=true;submitBtn.disabled=true;
-    fetch('/api/slots/?service={{ booking.service.id }}&staff={{ booking.staff.id }}&date='+date)
+    fetch('/api/slots/?service={{ booking.service.id }}&staff={{ booking.staff.id }}&date='+date+'&exclude={{ booking.id }}')
       .then(function(r){return r.json();}).then(function(data){
         if(data.slots&&data.slots.length>0){
           timeSelect.innerHTML='<option value="">Select a time</option>';
