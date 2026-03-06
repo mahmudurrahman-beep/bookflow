@@ -44,20 +44,12 @@ def api_services(request):
     return JsonResponse({'services': list(services)})
 
 def api_staff(request):
-    """Return list of active staff, optionally filtered by service"""
+    """Return active staff, filtered by service if provided"""
     service_id = request.GET.get('service')
-    
-    # Get all active staff
     staff = Staff.objects.filter(is_active=True)
-    
-    staff_list = []
-    for s in staff:
-        staff_list.append({
-            'id': s.id,
-            'name': s.name,
-            'email': s.email
-        })
-    
+    if service_id:
+        staff = staff.filter(services__id=service_id)
+    staff_list = [{'id': s.id, 'name': s.name, 'email': s.email} for s in staff]
     return JsonResponse({'staff': staff_list})
 
 def api_slots(request):
