@@ -57,30 +57,29 @@ def api_slots(request):
     service_id = request.GET.get('service')
     staff_id = request.GET.get('staff')
     date_str = request.GET.get('date')
-    
+    exclude_id = request.GET.get('exclude')
+
     if not all([service_id, date_str]):
         return JsonResponse({'error': 'Missing parameters'}, status=400)
-    
+
     try:
         service = Service.objects.get(id=service_id, is_active=True)
         target_date = datetime.strptime(date_str, '%Y-%m-%d').date()
-        
-        # If staff_id is provided and not empty, use that staff, otherwise get first available
+
         if staff_id and staff_id != '':
             staff = Staff.objects.get(id=staff_id, is_active=True)
-            slots = generate_slots_for_staff(service, staff, target_date)
+            slots = generate_slots_for_staff(service, staff, target_date, exclude_booking_id=exclude_id)
         else:
-            # Get all active staff and combine slots
             slots = []
             for staff in Staff.objects.filter(is_active=True):
-                staff_slots = generate_slots_for_staff(service, staff, target_date)
+                staff_slots = generate_slots_for_staff(service, staff, target_date, exclude_booking_id=exclude_id)
                 slots.extend([f"{s} (with {staff.name})" for s in staff_slots])
-        
+
         return JsonResponse({'slots': slots})
-    
+
     except (Service.DoesNotExist, Staff.DoesNotExist, ValueError) as e:
         return JsonResponse({'error': str(e)}, status=400)
-
+        
 def api_available_dates(request):
     """Return all dates with available slots for a given service/staff combo."""
     service_id = request.GET.get('service')
@@ -165,12 +164,12 @@ def api_public_calendar(request):
         'today': today.strftime('%Y-%m-%d'),
     })
 
-def generate_slots_for_staff(service, staff, target_date):
+def generate_slots_for_staff(service, staff, target_date, exclude_booking_id=None):
     """Helper function to generate slots for a specific staff member"""
     try:
         settings = BusinessSettings.objects.first()
         if not settings:
-            settings = BusinessSettings.objects.create()  # Create default settings
+            settings = BusinessSettings.objects.create()
 
         if settings.max_days_ahead > 0:
             max_date = timezone.now().date() + timedelta(days=settings.max_days_ahead)
@@ -182,7 +181,6 @@ def generate_slots_for_staff(service, staff, target_date):
         except WorkingHours.DoesNotExist:
             return []
 
-        # Combine date with times
         start_dt = datetime.combine(target_date, wh.start_time)
         end_dt = datetime.combine(target_date, wh.end_time)
 
@@ -207,12 +205,15 @@ def generate_slots_for_staff(service, staff, target_date):
         timeoff_list = list(TimeOff.objects.filter(staff=staff, date=target_date))
         day_start = tz.localize(datetime.combine(target_date, time(0, 0)), is_dst=False)
         day_end = tz.localize(datetime.combine(target_date, time(23, 59, 59)), is_dst=False)
-        booked_slots = list(Booking.objects.filter(
+        booked_slots_qs = Booking.objects.filter(
             staff=staff,
             status__in=['booked', 'confirmed'],
             start_datetime__lt=day_end + buffer,
             end_datetime__gt=day_start - buffer,
-        ))
+        )
+        if exclude_booking_id:
+            booked_slots_qs = booked_slots_qs.exclude(id=exclude_booking_id)
+        booked_slots = list(booked_slots_qs)
 
         slots = []
         current = start_dt
@@ -271,8 +272,7 @@ def generate_slots_for_staff(service, staff, target_date):
         return slots
 
     except Exception as e:
-        # Log unexpected errors (DST edge cases, bad timezone config, etc.)
-        print(f"[generate_slots_for_staff] Error for staff={staff.id} date={target_date}: {e}")
+        logger.error(f"Slot generation error for staff={staff.id} date={target_date}: {e}")
         return []
 
 @csrf_exempt
