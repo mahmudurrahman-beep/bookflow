@@ -215,7 +215,7 @@ document.getElementById('rescheduleDate')?.addEventListener('change', function()
     timeSelect.disabled = true;
     
     // Fetch available slots
-    fetch(`/api/slots/?booking_id=${bookingId}&date=${date}`)
+    fetch(`/api/slots/?booking_id=${bookingId}&date=${date}&exclude=${bookingId}`)
         .then(response => response.json())
         .then(data => {
             if (data.slots && data.slots.length > 0) {
