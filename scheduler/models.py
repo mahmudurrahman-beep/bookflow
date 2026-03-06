@@ -13,8 +13,9 @@ class Service(models.Model):
 
 class Staff(models.Model):
     name = models.CharField(max_length=100)
-    email = models.EmailField() 
+    email = models.EmailField()
     is_active = models.BooleanField(default=True)
+    services = models.ManyToManyField('Service', blank=True, related_name='staff_members')
 
     def __str__(self):
         return self.name
