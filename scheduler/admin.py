@@ -29,6 +29,7 @@ class TimeOffInline(admin.TabularInline):
 class StaffAdmin(admin.ModelAdmin):
     list_display = ['name', 'email', 'is_active', 'working_days_summary']
     list_filter = ['is_active']
+    filter_horizontal = ['services']
     inlines = [WorkingHoursInline, TimeOffInline]
 
     def working_days_summary(self, obj):
